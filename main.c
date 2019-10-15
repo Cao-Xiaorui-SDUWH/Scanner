@@ -2,10 +2,10 @@
 #include <intrins.h>
 #include <string.h>
 
-sbit STAT = P2^7;        //UART Í¨ĞÅ·½Ê½:Î´Á¬½ÓµÍµçÆ½£¬Á¬½Óºó¸ßµçÆ½
-sbit PWRC = P2^6;        //ÔÚÁ¬½Ó×´Ì¬ÏÂĞèÒª·¢ AT Ö¸ÁîÊ±£¬½«´ËÒı½Å±£³ÖµÍµçÆ½
-                         //ÔÚÎ´Á¬½Ó×´Ì¬ÏÂ´ËÒı½Å²»¹Ü¸ßµÍµçÆ½¾ùÎª AT Ö¸ÁîÄ£Ê½
-sbit RS485DIR = P3^5;    //¶¨Òå485µÄÊ¹ÄÜ½Å		
+sbit STAT = P2^7;        //UART é€šä¿¡æ–¹å¼:æœªè¿æ¥ä½ç”µå¹³ï¼Œè¿æ¥åé«˜ç”µå¹³
+sbit PWRC = P2^6;        //åœ¨è¿æ¥çŠ¶æ€ä¸‹éœ€è¦å‘ AT æŒ‡ä»¤æ—¶ï¼Œå°†æ­¤å¼•è„šä¿æŒä½ç”µå¹³
+                         //åœ¨æœªè¿æ¥çŠ¶æ€ä¸‹æ­¤å¼•è„šä¸ç®¡é«˜ä½ç”µå¹³å‡ä¸º AT æŒ‡ä»¤æ¨¡å¼
+sbit RS485DIR = P3^5;    //å®šä¹‰485çš„ä½¿èƒ½è„š		
 
 unsigned char Receive[11]={0}; 
 unsigned char Receive4[9]={0};
@@ -13,24 +13,24 @@ unsigned char index = 0;
 unsigned char index4 = 0;
 	
 /**************************************
-	   ¶¨Ê±Æ÷2³õÊ¼»¯ËùÓĞ´®¿Ú²¨ÌØÂÊ
+	   å®šæ—¶å™¨2åˆå§‹åŒ–æ‰€æœ‰ä¸²å£æ³¢ç‰¹ç‡
 **************************************/	
-//frequency µ¥Æ¬»úÆµÂÊ£»baudrate ²¨ÌØÂÊ
+//frequency å•ç‰‡æœºé¢‘ç‡ï¼›baudrate æ³¢ç‰¹ç‡
  void set_baudrate(float frequency,long int baudrate)
 {	
 	unsigned int itmp; 	
 	unsigned char tlow,thigh;
 
-	IRC24MCR = 0x80;//Ê¹ÄÜÄÚ²¿24M¸ß¾«¶ÈIRCÕñµ´Æ÷
+	IRC24MCR = 0x80;//ä½¿èƒ½å†…éƒ¨24Mé«˜ç²¾åº¦IRCæŒ¯è¡å™¨
 	
-	AUXR |= 0x01;	  //Ñ¡Ôñ¶¨Ê±Æ÷2Îª´®¿Ú1²¨ÌØÂÊ·¢ÉúÆ÷
-	AUXR |= 0x04;		//¶¨Ê±Æ÷2ËÙ¶È¿ØÖÆÎ»£¬²»·ÖÆµ1T
+	AUXR |= 0x01;	  //é€‰æ‹©å®šæ—¶å™¨2ä¸ºä¸²å£1æ³¢ç‰¹ç‡å‘ç”Ÿå™¨
+	AUXR |= 0x04;		//å®šæ—¶å™¨2é€Ÿåº¦æ§åˆ¶ä½ï¼Œä¸åˆ†é¢‘1T
 	
-	SCON = 0x50;    //¿É±ä²¨ÌØÂÊ8Î»Êı¾İ·½Ê½
-	PCON = 0x00;    //´®¿Ú1µÄ¸÷¸öÄ£Ê½²¨ÌØÂÊ¶¼²»¼Ó±¶,SMOD=0
-	S2CON = 0x50;   //ÔÊĞí´®¿Ú½ÓÊÕÊı¾İ£¬Ñ¡Ôñ¶¨Ê±Æ÷2Îª´®¿Ú2²¨ÌØÂÊ·¢ÉúÆ÷
-	S3CON = 0x10;   //ÔÊĞí´®¿Ú½ÓÊÕÊı¾İ£¬Ñ¡Ôñ¶¨Ê±Æ÷2Îª´®¿Ú3²¨ÌØÂÊ·¢ÉúÆ÷
-	S4CON = 0x10;   //ÔÊĞí´®¿Ú½ÓÊÕÊı¾İ£¬Ñ¡Ôñ¶¨Ê±Æ÷2Îª´®¿Ú4²¨ÌØÂÊ·¢ÉúÆ÷
+	SCON = 0x50;    //å¯å˜æ³¢ç‰¹ç‡8ä½æ•°æ®æ–¹å¼
+	PCON = 0x00;    //ä¸²å£1çš„å„ä¸ªæ¨¡å¼æ³¢ç‰¹ç‡éƒ½ä¸åŠ å€,SMOD=0
+	S2CON = 0x50;   //å…è®¸ä¸²å£æ¥æ”¶æ•°æ®ï¼Œé€‰æ‹©å®šæ—¶å™¨2ä¸ºä¸²å£2æ³¢ç‰¹ç‡å‘ç”Ÿå™¨
+	S3CON = 0x10;   //å…è®¸ä¸²å£æ¥æ”¶æ•°æ®ï¼Œé€‰æ‹©å®šæ—¶å™¨2ä¸ºä¸²å£3æ³¢ç‰¹ç‡å‘ç”Ÿå™¨
+	S4CON = 0x10;   //å…è®¸ä¸²å£æ¥æ”¶æ•°æ®ï¼Œé€‰æ‹©å®šæ—¶å™¨2ä¸ºä¸²å£4æ³¢ç‰¹ç‡å‘ç”Ÿå™¨
 	
 	itmp = (int)(65536-(frequency*1000000)/(baudrate*4));
 	thigh = itmp/256; 	
@@ -39,11 +39,11 @@ unsigned char index4 = 0;
 	TH2 = thigh; 	
 	TL2 = tlow; 	
 
-	AUXR |= 0x10;		//Æô¶¯¶¨Ê±Æ÷2
+	AUXR |= 0x10;		//å¯åŠ¨å®šæ—¶å™¨2
 }
 
 /**************************************
-	           Èí¼şÑÓÊ±
+	           è½¯ä»¶å»¶æ—¶
 **************************************/
 void Delay100ms()		//@24.000MHz
 {
@@ -80,10 +80,10 @@ void Delay5ms()		  //@24.000MHz
 }
 
 /**************************************
-	           ·µ»ØÖµ±È¶Ô
+	           è¿”å›å€¼æ¯”å¯¹
 **************************************/
-//Ö¸¶¨×Ö½ÚÊıÄÚ±È¶Ô½á¹ûÒ»ÖÂ£¬·µ»Ø0£»µ±±È¶Ôµ½Öµ²»Í¬µÄ×Ö½ÚÊ±£¬·µ»Øµ±Ç°×Ö½ÚµÄ²îÖµ
-//*p1¡¢*p2 ×Ö·ûÊı×é£»length ±È½Ï×Ö½ÚÊı
+//æŒ‡å®šå­—èŠ‚æ•°å†…æ¯”å¯¹ç»“æœä¸€è‡´ï¼Œè¿”å›0ï¼›å½“æ¯”å¯¹åˆ°å€¼ä¸åŒçš„å­—èŠ‚æ—¶ï¼Œè¿”å›å½“å‰å­—èŠ‚çš„å·®å€¼
+//*p1ã€*p2 å­—ç¬¦æ•°ç»„ï¼›length æ¯”è¾ƒå­—èŠ‚æ•°
 int string_cmp(const char *p1,const char *p2,unsigned int length)
 {    
     const unsigned char *s1=(const unsigned char*)p1;    
@@ -105,16 +105,16 @@ int string_cmp(const char *p1,const char *p2,unsigned int length)
 }
 
 /**************************************
-	           Êı¾İ·¢ËÍ
+	           æ•°æ®å‘é€
 **************************************/
-/*----------------´®¿Ú1--------------*/
+/*----------------ä¸²å£1--------------*/
 
 bit send_ok = 0;bit receive_ok = 0;
 void UART_Send_Byte(char aChar)
 {
 	SBUF = aChar;
  	send_ok = 1;
-	while(send_ok)         //µÈ´ı·¢ËÍ»º´æÎª¿Õ
+	while(send_ok)         //ç­‰å¾…å‘é€ç¼“å­˜ä¸ºç©º
 	{
 		if(TI)
 		{
@@ -124,14 +124,14 @@ void UART_Send_Byte(char aChar)
 	}
 }
 
-/*----------------´®¿Ú2---------------*/
+/*----------------ä¸²å£2---------------*/
 
 bit send2_ok = 0;bit receive2_ok = 0;
 void UART2_Send_Byte(char aChar)
 {
 	S2BUF = aChar;
  	send2_ok = 1;
-	while(send2_ok)        //µÈ´ı·¢ËÍ»º´æÎª¿Õ
+	while(send2_ok)        //ç­‰å¾…å‘é€ç¼“å­˜ä¸ºç©º
 	{
 		if(S2CON & 0x02)     //S3TI = 1
 	  {
@@ -141,14 +141,14 @@ void UART2_Send_Byte(char aChar)
 	}
 }
 
-/*----------------´®¿Ú3---------------*/
+/*----------------ä¸²å£3---------------*/
 
 bit send3_ok = 0;
 void UART3_Send_Byte(char aChar)
 {
 	S3BUF = aChar;
  	send3_ok = 1;	
-	while(send3_ok)        //µÈ´ı·¢ËÍ»º´æÎª¿Õ
+	while(send3_ok)        //ç­‰å¾…å‘é€ç¼“å­˜ä¸ºç©º
 	{
 		if(S3CON & 0x02)     //S3TI = 1
 	  {
@@ -158,14 +158,14 @@ void UART3_Send_Byte(char aChar)
 	}
 }
 
-/*-----------------´®¿Ú4--------------*/
+/*-----------------ä¸²å£4--------------*/
 
 bit send4_ok = 0;
 void UART4_Send_Byte(char aChar)
 {
 	S4BUF = aChar;
  	send4_ok = 1;
-	while(send4_ok)        //µÈ´ı·¢ËÍ»º´æÎª¿Õ
+	while(send4_ok)        //ç­‰å¾…å‘é€ç¼“å­˜ä¸ºç©º
 	{
 		if(S4CON & 0x02)     //S4TI = 1
 	  {
@@ -178,26 +178,26 @@ void UART4_Send_Byte(char aChar)
 /**************************************
 	            LiDar
 **************************************/	
-//·¢ËÍ¿ªÊ¼½ÓÊÕF4 05 00 00 00 00 CRC(Ğ£Ñé) 4F
+//å‘é€å¼€å§‹æ¥æ”¶F4 05 00 00 00 00 CRC(æ ¡éªŒ) 4F
 void UART_Send_Start()             
 {
 	unsigned char start[8];
 	unsigned int i;
 	start[0]=0xF4;start[1]=0x05;start[2]=0x00;start[3]=0x00;
-  start[4]=0x00;start[5]=0x00;start[6]=0xCC;start[7]=0x4F;
+        start[4]=0x00;start[5]=0x00;start[6]=0xCC;start[7]=0x4F;
 	for ( i = 0; i< 8; i++ )
 	{
 		UART_Send_Byte( start[i] );
 	}
 }
 
-//·¢ËÍÍ£Ö¹½ÓÊÕF4 06 00 00 00 00 88 4F
+//å‘é€åœæ­¢æ¥æ”¶F4 06 00 00 00 00 88 4F
 void UART_Send_Stop()              
 {
 	unsigned char stop[8];
 	unsigned int i;
 	stop[0]=0xF4;stop[1]=0x06;stop[2]=0x00;stop[3]=0x00;
-  stop[4]=0x00;stop[5]=0x00;stop[6]=0x88;stop[7]=0x4F;
+        stop[4]=0x00;stop[5]=0x00;stop[6]=0x88;stop[7]=0x4F;
 	for ( i = 0; i< 8; i++ )
 	{
 		UART_Send_Byte( stop[i] );
@@ -205,9 +205,9 @@ void UART_Send_Stop()
 }
 
 /**************************************
-	           µç»ú¿ØÖÆ
+	           ç”µæœºæ§åˆ¶
 **************************************/	
-//·¢ËÍLength-1¸öÊı¾İ+1¸öÊı¾İÀÛ¼ÓºÍ
+//å‘é€Length-1ä¸ªæ•°æ®+1ä¸ªæ•°æ®ç´¯åŠ å’Œ
 //void UART2_Send(unsigned char *Buffer, unsigned char Length)
 //{
 //	unsigned char i=0;
@@ -222,41 +222,41 @@ void UART_Send_Stop()
 //	}
 //}
 
-//µç»ú¶ÁÈ¡±àÂëÆ÷ÃüÁî
+//ç”µæœºè¯»å–ç¼–ç å™¨å‘½ä»¤
 //void read_code(unsigned char datas)
 //{
 //	unsigned char bytes[5];
 //	memset(bytes,0,sizeof(bytes));
 //	bytes[0]=0x3E;
 //	bytes[1]=0x90;
-//	bytes[2]=datas;     //µç»úid
+//	bytes[2]=datas;     //ç”µæœºid
 //	bytes[3]=0x00;
-//	UART2_Send(bytes,5); //·¢ËÍÖ¡Í·¡¢¹¦ÄÜ×Ö½Ú¡¢Ğ£ÑéºÍ
+//	UART2_Send(bytes,5); //å‘é€å¸§å¤´ã€åŠŸèƒ½å­—èŠ‚ã€æ ¡éªŒå’Œ
 //}
 
-//Î»ÖÃ±Õ»·¿ØÖÆ1(Ä¿±êÎ»ÖÃ£¨¶àÈ¦½Ç¶ÈÀÛ¼ÆÖµ£©)
-//send µç»úid;*Data µ½´ïÎ»ÖÃ(8¸ö×Ö½Ú)
+//ä½ç½®é—­ç¯æ§åˆ¶1(ç›®æ ‡ä½ç½®ï¼ˆå¤šåœˆè§’åº¦ç´¯è®¡å€¼ï¼‰)
+//send ç”µæœºid;*Data åˆ°è¾¾ä½ç½®(8ä¸ªå­—èŠ‚)
 void locate_1(unsigned char send,unsigned char *Data)
 {
 	unsigned char TX_DATA2[14],k=0,j=0,l=5,m=0;
-	memset(TX_DATA2,0,sizeof(TX_DATA2));//Çå¿Õ·¢ËÍÊı¾İ
-	TX_DATA2[0]=0X3E;                   //Ö¡Í·
-	TX_DATA2[1]=0XA3;                   //Ö¡Í·
-	TX_DATA2[2]=send;                   //µç»úid
-	TX_DATA2[3]=0x08;                   //Êı¾İ³¤¶È
+	memset(TX_DATA2,0,sizeof(TX_DATA2));//æ¸…ç©ºå‘é€æ•°æ®
+	TX_DATA2[0]=0X3E;                   //å¸§å¤´
+	TX_DATA2[1]=0XA3;                   //å¸§å¤´
+	TX_DATA2[2]=send;                   //ç”µæœºid
+	TX_DATA2[3]=0x08;                   //æ•°æ®é•¿åº¦
 	
-	while(j<4)                          //1~4Î»Ğ£ÑéºÍ
+	while(j<4)                          //1~4ä½æ ¡éªŒå’Œ
 	{
 		TX_DATA2[4]+=TX_DATA2[j];
 		j+=1;
 	}
 	
-	for(k=0;k<8;k++)                    //´æÈëÊı¾İµ½»º´æTX_DATAÊı×é
+	for(k=0;k<8;k++)                    //å­˜å…¥æ•°æ®åˆ°ç¼“å­˜TX_DATAæ•°ç»„
 	{
 		TX_DATA2[k+5]=Data[k];
 	}
 	
-	while(l<13)                         //6~13Î»Ğ£ÑéºÍ
+	while(l<13)                         //6~13ä½æ ¡éªŒå’Œ
 	{
 		TX_DATA2[13]+=TX_DATA2[l];
 		l+=1;
@@ -264,40 +264,40 @@ void locate_1(unsigned char send,unsigned char *Data)
 	
 	while(m<14)
 	{
-		UART2_Send_Byte(TX_DATA2[m++]);   //ÕûÖ¡·¢ËÍ
+		UART2_Send_Byte(TX_DATA2[m++]);   //æ•´å¸§å‘é€
 	}
 }
 
-//Î»ÖÃ±Õ»·¿ØÖÆ4(×ª¶¯·½Ïò¡¢Ä¿±êÎ»ÖÃ£¨µ¥È¦½Ç¶ÈÖµ£©ºÍµç»ú×ª¶¯µÄ×î´óËÙ¶È)
-//id_code µç»úid;direction ×ª¶¯·½Ïò£»*angle µ½´ïÎ»ÖÃ(8¸ö×Ö½Ú)£»*speed ×ª¶¯ËÙ¶È
+//ä½ç½®é—­ç¯æ§åˆ¶4(è½¬åŠ¨æ–¹å‘ã€ç›®æ ‡ä½ç½®ï¼ˆå•åœˆè§’åº¦å€¼ï¼‰å’Œç”µæœºè½¬åŠ¨çš„æœ€å¤§é€Ÿåº¦)
+//id_code ç”µæœºid;direction è½¬åŠ¨æ–¹å‘ï¼›*angle åˆ°è¾¾ä½ç½®(8ä¸ªå­—èŠ‚)ï¼›*speed è½¬åŠ¨é€Ÿåº¦
 void locate_4(unsigned char id_code,unsigned char direction,unsigned char *angle,unsigned char *speed)
 {
 	unsigned char TX_DATA2[14],k=0,j=0,i=0,l=5,m=0;
-	memset(TX_DATA2,0,sizeof(TX_DATA2));//Çå¿Õ·¢ËÍÊı¾İ
-	TX_DATA2[0]=0X3E;                   //Ö¡Í·
-	TX_DATA2[1]=0XA6;                   //Ö¡Í·
-	TX_DATA2[2]=id_code;                //µç»úid
-	TX_DATA2[3]=0x08;                   //Êı¾İ³¤¶È
+	memset(TX_DATA2,0,sizeof(TX_DATA2));//æ¸…ç©ºå‘é€æ•°æ®
+	TX_DATA2[0]=0X3E;                   //å¸§å¤´
+	TX_DATA2[1]=0XA6;                   //å¸§å¤´
+	TX_DATA2[2]=id_code;                //ç”µæœºid
+	TX_DATA2[3]=0x08;                   //æ•°æ®é•¿åº¦
 	
-	while(j<4)                          //1~4Î»Ğ£ÑéºÍ
+	while(j<4)                          //1~4ä½æ ¡éªŒå’Œ
 	{
 		TX_DATA2[4]+=TX_DATA2[j];
 		j+=1;
 	}
 	
-	TX_DATA2[5]=direction;              //´æÈë·½ÏòÊı¾İµ½»º´æTX_DATAÊı×é
+	TX_DATA2[5]=direction;              //å­˜å…¥æ–¹å‘æ•°æ®åˆ°ç¼“å­˜TX_DATAæ•°ç»„
 	
-	for(k=0;k<3;k++)                    //´æÈë½Ç¶ÈÊı¾İµ½»º´æTX_DATAÊı×é
+	for(k=0;k<3;k++)                    //å­˜å…¥è§’åº¦æ•°æ®åˆ°ç¼“å­˜TX_DATAæ•°ç»„
 	{
 		TX_DATA2[k+6]=angle[k];
 	}
 	
-	for(i=0;i<4;i++)                    //´æÈëËÙ¶ÈÊı¾İµ½»º´æTX_DATAÊı×é
+	for(i=0;i<4;i++)                    //å­˜å…¥é€Ÿåº¦æ•°æ®åˆ°ç¼“å­˜TX_DATAæ•°ç»„
 	{
 		TX_DATA2[i+9]=speed[i];
 	}
 	
-	while(l<13)                         //6~13Î»Ğ£ÑéºÍ
+	while(l<13)                         //6~13ä½æ ¡éªŒå’Œ
 	{
 		TX_DATA2[13]+=TX_DATA2[l];
 		l+=1;
@@ -309,16 +309,16 @@ void locate_4(unsigned char id_code,unsigned char direction,unsigned char *angle
 	}
 }
 
-//Ê®Áù½øÖÆ×ª»»£¨µÍ×Ö½ÚÔÚÇ°£©
+//åå…­è¿›åˆ¶è½¬æ¢ï¼ˆä½å­—èŠ‚åœ¨å‰ï¼‰
 unsigned char intTohex[3],intTohex4[4],intTohex8[8];
-unsigned char change3(long number)     //3¸ö×Ö½Ú
+unsigned char change3(long number)     //3ä¸ªå­—èŠ‚
 {
 	intTohex[0]=(char)number;
 	intTohex[1]=(number>>8)&0x00ff;
 	intTohex[2]=(number>>16)&0x00ff;
 	return intTohex;
 }
-unsigned char change4(long number)     //4¸ö×Ö½Ú
+unsigned char change4(long number)     //4ä¸ªå­—èŠ‚
 {
 	intTohex4[0]=(char)number;
 	intTohex4[1]=(number>>8)&0x00ff;
@@ -326,7 +326,7 @@ unsigned char change4(long number)     //4¸ö×Ö½Ú
 	intTohex4[3]=(number>>24)&0x00ff;
 	return intTohex4;
 }
-unsigned char change8(long number)     //8¸ö×Ö½Ú
+unsigned char change8(long number)     //8ä¸ªå­—èŠ‚
 {
 	intTohex8[0]=(char)number;
 	intTohex8[1]=(number>>8)&0x00ff;
@@ -340,7 +340,7 @@ unsigned char change8(long number)     //8¸ö×Ö½Ú
 }
 
 /**************************************
-	          ttlÉãÏñÍ·
+	          ttlæ‘„åƒå¤´
 **************************************/	
 void UART4_Send_String(char *aString, unsigned int StringLength)
 {
@@ -351,55 +351,55 @@ void UART4_Send_String(char *aString, unsigned int StringLength)
 	}
 }
 
-//ÅÄÕÕÁ÷³Ìa\b\d
+//æ‹ç…§æµç¨‹a\b\d
 void take_photo(unsigned char a,unsigned char b)
 {
 	unsigned char TX_DATA[5];
-	memset(TX_DATA,0,sizeof(TX_DATA));//Çå¿Õ·¢ËÍÊı¾İ
-	TX_DATA[0]=0x56;                  //Ö¡Í·
-	TX_DATA[1]=0x00;                  //ĞòÁĞºÅ
-	TX_DATA[2]=a;                     //ÃüÁî×Ö
-	TX_DATA[3]=0x01;                  //Êı¾İ³¤¶È
+	memset(TX_DATA,0,sizeof(TX_DATA));//æ¸…ç©ºå‘é€æ•°æ®
+	TX_DATA[0]=0x56;                  //å¸§å¤´
+	TX_DATA[1]=0x00;                  //åºåˆ—å·
+	TX_DATA[2]=a;                     //å‘½ä»¤å­—
+	TX_DATA[3]=0x01;                  //æ•°æ®é•¿åº¦
 	TX_DATA[4]=b;                     
 	
 	UART4_Send_String(TX_DATA,5);
 }
 
-//ÅÄÕÕÁ÷³Ìc  56 00 32 0C 00 0C 00 00 00 00 xx xx xx xx 00 FF
+//æ‹ç…§æµç¨‹c  56 00 32 0C 00 0C 00 00 00 00 xx xx xx xx 00 FF
 void take_data(unsigned char ah,unsigned char bh,unsigned char ch,unsigned char dh)
 {
 	unsigned char TX_DATA[16];
-	memset(TX_DATA,0,sizeof(TX_DATA));//Çå¿Õ·¢ËÍÊı¾İ
-	TX_DATA[0]=0x56;                  //Ö¡Í·
-	TX_DATA[1]=0x00;                  //ĞòÁĞºÅ
+	memset(TX_DATA,0,sizeof(TX_DATA));//æ¸…ç©ºå‘é€æ•°æ®
+	TX_DATA[0]=0x56;                  //å¸§å¤´
+	TX_DATA[1]=0x00;                  //åºåˆ—å·
 	TX_DATA[2]=0x32;                  
 	TX_DATA[3]=0x0C;                  
 	TX_DATA[4]=0x00;                  
-	TX_DATA[5]=0x0C;                  //²Ù×÷·½Ê½
-	TX_DATA[6]=0x00;                  //4bytesÆğÊ¼µØÖ·
+	TX_DATA[5]=0x0C;                  //æ“ä½œæ–¹å¼
+	TX_DATA[6]=0x00;                  //4bytesèµ·å§‹åœ°å€
 	TX_DATA[7]=0x00;
 	TX_DATA[8]=0x00;
 	TX_DATA[9]=0x00;
-	TX_DATA[10]=ah;                   //4bytesÍ¼Ïñ³¤¶È
-  TX_DATA[11]=bh;
+	TX_DATA[10]=ah;                   //4byteså›¾åƒé•¿åº¦
+        TX_DATA[11]=bh;
 	TX_DATA[12]=ch;
 	TX_DATA[13]=dh;
-	TX_DATA[14]=0x00;                 //2byteÑÓÊ±Ê±¼ä
-	TX_DATA[15]=0xFF;                 //ÑÓÊ±Ê±¼äÖ¸ÉãÏñ·µ»ØÃüÁîÓëÊı¾İ¼äµÄÊ±¼ä¼ä¸ô£¬µ¥Î»Îª0.01mS
+	TX_DATA[14]=0x00;                 //2byteå»¶æ—¶æ—¶é—´
+	TX_DATA[15]=0xFF;                 //å»¶æ—¶æ—¶é—´æŒ‡æ‘„åƒè¿”å›å‘½ä»¤ä¸æ•°æ®é—´çš„æ—¶é—´é—´éš”ï¼Œå•ä½ä¸º0.01mS
 	
 	UART4_Send_String(TX_DATA,16);
 }
 
-//ÉãÏñÍ·¹¤×÷º¯Êı
-//¹ı³ÌÖĞÈç¹û³öÏÖÒì³££¬½«¼ÌĞø·µ»ØÖ÷º¯ÊıÖ´ĞĞ
+//æ‘„åƒå¤´å·¥ä½œå‡½æ•°
+//è¿‡ç¨‹ä¸­å¦‚æœå‡ºç°å¼‚å¸¸ï¼Œå°†ç»§ç»­è¿”å›ä¸»å‡½æ•°æ‰§è¡Œ
 void UART4_work()
 {
-	long     int  last,num=0;          //¼ÆÊıÆ÷
-	unsigned char getd;                //Êı¾İÖĞ×ª
+	long     int  last,num=0;          //è®¡æ•°å™¨
+	unsigned char getd;                //æ•°æ®ä¸­è½¬
 	unsigned char ah,bh,ch,dh;
 	unsigned char res1[5],res2[5],res3[5];
 	
-	//Ö¸Áî±È¶Ô
+	//æŒ‡ä»¤æ¯”å¯¹
 	res1[0]=0x76;res1[1]=0x00;res1[2]=0x36;res1[3]=0x00;res1[4]=0x00;
 	res2[0]=0x76;res2[1]=0x00;res2[2]=0x34;res2[3]=0x00;res2[4]=0x04;
 	res3[0]=0x76;res3[1]=0x00;res3[2]=0x26;res3[3]=0x00;res3[4]=0x00;
@@ -407,17 +407,17 @@ void UART4_work()
 	memset(Receive4,0,9);	
 	index4 = 0;
 	IE2 = 0x00;	
-	take_photo(0x36,0x00);             //Í£Ö¹µ±Ç°Ö¡Ë¢ĞÂ	  
+	take_photo(0x36,0x00);             //åœæ­¢å½“å‰å¸§åˆ·æ–°	  
 	
 	IE2 |= ES4;		
 	while(index4!=5);
-  if(string_cmp(Receive4,res1,5)!= 0)return;
+        if(string_cmp(Receive4,res1,5)!= 0)return;
 			
 	
 	IE2 = 0x00;	    
 	memset(Receive4,0,9);
 	index4 = 0;
-	take_photo(0x34,0x00);             //»ñÈ¡Í¼Æ¬³¤¶È
+	take_photo(0x34,0x00);             //è·å–å›¾ç‰‡é•¿åº¦
 			
 	IE2 |= ES4;
 	while(index4!=9);
@@ -425,14 +425,14 @@ void UART4_work()
 
 	IE2 = 0x00;
 	
-	ah = Receive4[5];                  //È¡³öÍ¼Ïñ³¤¶ÈĞÅÏ¢
+	ah = Receive4[5];                  //å–å‡ºå›¾åƒé•¿åº¦ä¿¡æ¯
 	bh = Receive4[6]; 
 	ch = Receive4[7];
 	dh = Receive4[8];  
 	last = (ah << 24)|(bh << 16)|(ch << 8)|dh;
 	last += 10;
 	
-	take_data(ah,bh,ch,dh);            //»ñÈ¡Í¼Æ¬
+	take_data(ah,bh,ch,dh);            //è·å–å›¾ç‰‡
 	while(num != last)
 	{
 		if(S4CON & 0x01) 
@@ -446,26 +446,26 @@ void UART4_work()
 			
 	memset(Receive4,0,9);
 	index4 = 0;
-	take_photo(0x36,0x02);             //»Ö¸´Ö¡Ë¢ĞÂ
+	take_photo(0x36,0x02);             //æ¢å¤å¸§åˆ·æ–°
 				
 	IE2 |= ES4;
 	while(index4 != 5);
-  if(string_cmp(Receive4,res1,5)!= 0)return;
+        if(string_cmp(Receive4,res1,5)!= 0)return;
 			
-  if(P_SW2 == 0x00)                  //ÉãÏñÍ·´®¿ÚÇĞ»»
+        if(P_SW2 == 0x00)                  //æ‘„åƒå¤´ä¸²å£åˆ‡æ¢
 	{
 		P_SW2 = 0x04;
 	}
-  else P_SW2 = 0x00;			
+        else P_SW2 = 0x00;			
 }
 
 void main()
 {
 	unsigned long i,j,r,sum;
 	unsigned char count;
-  unsigned char real[4],angle[3];
+        unsigned char real[4],angle[3];
 	
-	for(r = 0;r<30;r++)Delay100ms();   //ÉÏµçÑÓÊ±
+	for(r = 0;r<30;r++)Delay100ms();   //ä¸Šç”µå»¶æ—¶
 	
 	real[0]=0xF4;real[1]=0x07;real[2]=0x00;real[3]=0x00;
 
@@ -474,10 +474,10 @@ void main()
 	EA = 1;
 	IE2 = 0x00;
 	
-	RS485DIR=1;                        //´ò¿ª485Ä£¿é·¢ËÍÊ¹ÄÜ£¬¹Ø±Õ½ÓÊÕ¹¦ÄÜ
+	RS485DIR=1;                        //æ‰“å¼€485æ¨¡å—å‘é€ä½¿èƒ½ï¼Œå…³é—­æ¥æ”¶åŠŸèƒ½
 	
 	change8(0);
-	locate_1(0x01,intTohex8);          //Ê¹ÓÃÎ»ÖÃ±Õ»·¿ØÖÆ1ÒÔ×î¿ìËÙ¶Èµ½´ïÄ¬ÈÏ³õÊ¼Î»ÖÃ
+	locate_1(0x01,intTohex8);          //ä½¿ç”¨ä½ç½®é—­ç¯æ§åˆ¶1ä»¥æœ€å¿«é€Ÿåº¦åˆ°è¾¾é»˜è®¤åˆå§‹ä½ç½®
 	Delay100ms();
 
 	locate_1(0x04,intTohex8);
@@ -488,15 +488,15 @@ void main()
 	
 	for(r=0;r<20;r++)Delay100ms();
 	
-	while (STAT == 0);                 //À¶ÑÀÁ¬½Ó¼ì²â
+	while (STAT == 0);                 //è“ç‰™è¿æ¥æ£€æµ‹
 	
 	P_SW1 = 0x80;
 			
 //	r=0;
 //	do
 //	{
-//    ES = 0;
-//		UART_Send_Byte(0xA5);//·¢ËÍ¶Á·½Î»½ÇÖ¸Áî
+//        ES = 0;
+//	  UART_Send_Byte(0xA5);//å‘é€è¯»æ–¹ä½è§’æŒ‡ä»¤
 //	  UART_Send_Byte(0x45);
 //	  UART_Send_Byte(0xEA);
 //		
@@ -505,31 +505,31 @@ void main()
 //			
 //		while(index!=11);
 //		
-////		if(receive_ok) //´®¿Ú½ÓÊÕÍê±Ï
+////		if(receive_ok) //ä¸²å£æ¥æ”¶å®Œæ¯•
 ////		{
 //			ES = 0;
 
-//			UART_Send_Byte(0xA5);//·¢ËÍÍ£Ö¹¶Á·½Î»½ÇÖ¸Áî
+//		  UART_Send_Byte(0xA5);//å‘é€åœæ­¢è¯»æ–¹ä½è§’æŒ‡ä»¤
 //		  UART_Send_Byte(0x75);
 //		  UART_Send_Byte(0x1A);
 //			
-//			for(sum=0,i=0;i<(Receive[3]+4);i++)//·½Î»½Çangle_data[3]=2
+//			for(sum=0,i=0;i<(Receive[3]+4);i++)//æ–¹ä½è§’angle_data[3]=2
 //			{
 //				sum+=Receive[i];
 //			}
 //			
-//			if(sum==Receive[10])                //Ğ£ÑéºÍÅĞ¶Ï
+//			if(sum==Receive[10])                //æ ¡éªŒå’Œåˆ¤æ–­
 //			{
 //				angle[0]=(Receive[4]<<8)|Receive[5];
 //				angle[1]=(Receive[6]<<8)|Receive[7];
-//				angle[2]=(Receive[8]<<8)|Receive[9];//Êµ¼ÊÖµµÄ100±¶
+//				angle[2]=(Receive[8]<<8)|Receive[9];//å®é™…å€¼çš„100å€
 //				
-//			  UART3_Send_Byte(Receive[0]);
+//			        UART3_Send_Byte(Receive[0]);
 //				UART3_Send_Byte(Receive[1]);
 //				UART3_Send_Byte(Receive[2]);
 //				UART3_Send_Byte(Receive[3]);
 //	
-//			  UART3_Send_Byte(Receive[4]);
+//			        UART3_Send_Byte(Receive[4]);
 //				UART3_Send_Byte(Receive[5]);
 //				UART3_Send_Byte(Receive[6]);
 //				UART3_Send_Byte(Receive[7]);
@@ -537,7 +537,7 @@ void main()
 //				UART3_Send_Byte(Receive[9]);
 //				r+=1;
 //	}			
-//			receive_ok=0;                               //´¦ÀíÊı¾İÍê±Ï±êÖ¾			
+//			receive_ok=0;                               //å¤„ç†æ•°æ®å®Œæ¯•æ ‡å¿—			
 ////		}
 //	}while(r<3);
 
@@ -546,27 +546,27 @@ void main()
 //do
 //			{
 		index = 0;  
-		UART_Send_Byte(0xA5);//·¢ËÍ¶Á·½Î»½ÇÖ¸Áî
-	  UART_Send_Byte(0x45);
-	  UART_Send_Byte(0xEA);
+		UART_Send_Byte(0xA5);//å‘é€è¯»æ–¹ä½è§’æŒ‡ä»¤
+	        UART_Send_Byte(0x45);
+	        UART_Send_Byte(0xEA);
 			
 		SBUF = 0x00;RI = 0;
 		ES = 1;
-	  Delay5ms();
+	        Delay5ms();
 			
 		while(index!=11);
-    ES = 0;
+                ES = 0;
 			    
-		UART_Send_Byte(0xA5);//·¢ËÍÍ£Ö¹¶Á·½Î»½ÇÖ¸Áî
+		UART_Send_Byte(0xA5);//å‘é€åœæ­¢è¯»æ–¹ä½è§’æŒ‡ä»¤
 		UART_Send_Byte(0x75);
-	  UART_Send_Byte(0x1A);
+	        UART_Send_Byte(0x1A);
 		Delay5ms();
 //			    if(string_cmp(Receive,real,4)==0)
 //			    {
 		UART3_Send_Byte(Receive[4]);
 		UART3_Send_Byte(Receive[5]);
 		UART3_Send_Byte(Receive[6]);
-	  UART3_Send_Byte(Receive[7]);
+	        UART3_Send_Byte(Receive[7]);
 		UART3_Send_Byte(Receive[8]);
 		UART3_Send_Byte(Receive[9]);
 //					 count += 1;
@@ -577,122 +577,117 @@ void main()
     
 
 
-	P_SW1 = 0x40;
+  P_SW1 = 0x40;
 	
-	change4(18000);
-	for (i=0;i<=18;i++)
-	{      		
-		change3(i*1000); 
+  change4(18000);
+  for (i=0;i<=18;i++)
+  {      		
+     change3(i*1000); 
+     locate_4(0x01, 0x00, intTohex, intTohex4);
 		
-		locate_4(0x01, 0x00, intTohex, intTohex4);
+     Delay100ms();
 		
-		Delay100ms();
-		
-    for (j=0;j<=27;j++)
-		{ 
-			count = 0;
-			change3(j*1000);
+     for (j=0;j<=27;j++)
+    { 
+      count = 0;
+      change3(j*1000);
       RS485DIR = 1;	
       IE2 = 0x00; 
       locate_4(0x03, 0x00, intTohex, intTohex4);
-			Delay100ms();
+      Delay100ms();
 			
-		 do
-		 {
-			index = 0;  
-			UART_Send_Start();
+	do
+      {
+	  index = 0;  
+	  UART_Send_Start();
 			
-			SBUF = 0x00;RI = 0;
-			ES = 1;
-		  Delay5ms();
+	  SBUF = 0x00;RI = 0;
+	  ES = 1;
+	  Delay5ms();
 			
-			while(index!=8);
-      ES = 0;
+	  while(index!=8);
+          ES = 0;
 			    
-			UART_Send_Stop();
+	  UART_Send_Stop();
 			
-			if(string_cmp(Receive,real,4)==0)
-			{
+	  if(string_cmp(Receive,real,4)==0)
+	  {
 				UART3_Send_Byte(Receive[0]);
 				UART3_Send_Byte(Receive[1]);
 				UART3_Send_Byte(Receive[2]);
 				UART3_Send_Byte(Receive[3]);
-			  UART3_Send_Byte(Receive[4]);
+			        UART3_Send_Byte(Receive[4]);
 				UART3_Send_Byte(Receive[5]);
-			  UART3_Send_Byte(Receive[6]);
+			        UART3_Send_Byte(Receive[6]);
 				UART3_Send_Byte(Receive[7]);
 				count += 1;
-			}	
-			index = 0;
+	   }	
+	   index = 0;
 
-		 }while(count == 0);
+	}while(count == 0);
     }
 		
-		change3(0);
-
+    change3(0);
     locate_4(0x03, 0x01, intTohex, intTohex4);
 		
-		for(r=0;r<=15;r++)Delay100ms();
+    for(r=0;r<=15;r++)Delay100ms();
   }	
   
-	change3(0);
-	locate_4(0x01, 0x01, intTohex, intTohex4);
-	for (i=0;i<=20;i++)Delay100ms();
+   change3(0);
+   locate_4(0x01, 0x01, intTohex, intTohex4);
+   for (i=0;i<=20;i++)Delay100ms();
 	
-	change4(36000);
-	for (i=0;i<=5;i++)
-	{      		
-    change3(i*6000); 
+   change4(36000);
+   for (i=0;i<=5;i++)
+  {      		
+     change3(i*6000); 
+     locate_4(0x01, 0x00, intTohex, intTohex4);
 		
-		locate_4(0x01, 0x00, intTohex, intTohex4);
+     for(r=0;r<=5;r++)Delay100ms();
 		
-		for(r=0;r<=5;r++)Delay100ms();
-		
-    for (j=0;j<=5;j++)
-		{ 
-			change3(j*6000);
+     for (j=0;j<=5;j++)
+    { 
+      change3(j*6000);
       RS485DIR = 1;
       IE2 = 0x00; 
       locate_4(0x03, 0x00, intTohex, intTohex4);
-			for(r=0;r<=5;r++)Delay100ms();
+      for(r=0;r<=5;r++)Delay100ms();
 			
 			UART4_work();Delay100ms();
-			UART4_work();
-			
+			UART4_work();			
     }
 		
-		change3(0);
-
+    change3(0);
     locate_4(0x03, 0x01, intTohex, intTohex4);
 		
-		for(r=0;r<=15;r++)Delay100ms();
+    for(r=0;r<=15;r++)Delay100ms();
   }	
   while(1);	
 }
 
 /**************************************
-	          ´®¿ÚÖĞ¶Ïº¯Êı
+	          ä¸²å£ä¸­æ–­å‡½æ•°
 **************************************/	
 void Usart() interrupt 4
 {
 
-	  if (TI)
+    if (TI)
     {
-			TI = 0;                 //Çå³ıTIÎ»
+			TI = 0;                 //æ¸…é™¤TIä½
 			send_ok=0;
     }
 		
     if (RI)
-		{      
+    {      
 			Receive[index]=SBUF;
 			index += 1;
-			RI = 0;                 //Çå³ıRIÎ»
+			RI = 0;                 //æ¸…é™¤RIä½
 //			if (index==11)
 //      {
 //				index = 0;
 //				receive_ok = 1;
 //      }				
-		}
+    }
 		
 }
 
